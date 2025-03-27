@@ -8,12 +8,14 @@ import torch
 import numpy as np
 
 # model = YOLO("./runs/detect/train/weights/last.pt")  
-model = attempt_load_weights("./runs/detect/train/weights/last.pt")
+model = attempt_load_weights("./runs/detect/train/weights/best.pt")
 
 INPUT_W=640
 INPUT_H=640
 
-names = ["person","cat","dog","horse"]
+names = ['ambulance', 'army vehicle', 'auto rickshaw', 'bicycle', 'bus', 'car', 'garbagevan', 'human hauler', 'minibus', 
+         'minivan', 'motorbike', 'pickup', 'policecar', 'rickshaw', 'scooter', 'suv', 'taxi', 'three wheelers -CNG-', 
+         'truck', 'van', 'wheelbarrow']
 
 # 前处理和YOLOv5相同
 def preprocess_image(image_path):
@@ -87,16 +89,15 @@ def postprocess(preds, img, orig_img):
     return preds
 
 
-
-files = os.listdir("./test_img")
+data_root = "datasets/val/images"
+files = os.listdir(data_root)
 
 for file in files:
     print(file)
-    img_path = os.path.join("./test_img",file)
+    img_path = os.path.join(data_root, file)
 
     image,image_raw,h,w = preprocess_image(img_path)
     input_ = torch.tensor(image)
-
 
     preds = model(input_)
     # print(len(preds))
@@ -118,8 +119,6 @@ for file in files:
                 label_text = names[int(cls_)]
                 # print(conf.cpu().detach().numpy())
                 prob = round(conf.cpu().detach().numpy().item(),2)
-
-
 
                 # tl = line_thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
                 tl = round(0.02 * (image.shape[0] + image.shape[1]) / 2) + 1  # line/font thickness
